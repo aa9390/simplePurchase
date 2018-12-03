@@ -76,7 +76,7 @@ public class AuthActivity extends AppCompatActivity implements GoogleApiClient.O
                 firebaseAuthWithGoogle( account );
             }
             else {
-                Toast.makeText( getApplicationContext(), "인증 실패", Toast.LENGTH_SHORT ).show();
+                Toast.makeText( getApplicationContext(), "네트워크 설정을 확인해 주세요.", Toast.LENGTH_SHORT ).show();
             }
         }
     }
@@ -105,4 +105,5 @@ public class AuthActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         } );
     }
+
 }
