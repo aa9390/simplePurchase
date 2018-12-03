@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity
 
     private NavigationView navigationView;
     private EditText memoText;
+    private String selectedMemoKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +64,15 @@ public class MainActivity extends AppCompatActivity
         saveMemoBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // 메뉴에서 메모를 선택한 상태이면 -> selectedMemoKey로 불러온 것
+                // 따라서 selectedMemoKey가 null이면 그대로 save, 아니면 update
+                if(selectedMemoKey == null) {
                     saveMemo();
+                }
+                else {
+                    updateMemo();
+                }
+
             }
         } );
 
@@ -92,6 +101,9 @@ public class MainActivity extends AppCompatActivity
 
         // 프로필 설정
         updateProfile();
+
+        // 저장된 메모 가져오기
+        getMemosFromDatabase();
     }
 
     @Override
@@ -132,20 +144,9 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
+        Memo selectedMemo = (Memo)item.getActionView().getTag();
+        memoText.setText( selectedMemo.getTxt() );
+        selectedMemoKey = selectedMemo.getKey();    // 수정 or 삭제 시 해당 key로 작업
         DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
         drawer.closeDrawer( GravityCompat.START );
         return true;
@@ -159,7 +160,7 @@ public class MainActivity extends AppCompatActivity
             // Model 생성
             Memo memo = new Memo();
             memo.setTxt( memoText.getText().toString() );
-            memo.setCreateDate( new Date() );   // 현재 날짜
+            memo.setCreateDate( new Date().getTime() );   // 현재 날짜
 
             // setValue의 인자로 DB에 들어갈 데이터 형식의 Object가 들어감
             firebaseDatabase.getReference( "memos/" + firebaseUser.getUid() ).push().setValue( memo )
@@ -183,7 +184,26 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void initMemo() {
-        memoText.setText( null );
+        memoText.setText( "" );
+    }
+
+    public void updateMemo() {
+        if (memoText.getText().toString().isEmpty()) {
+            Snackbar.make( memoText, "메모를 입력해 주세요.", Snackbar.LENGTH_SHORT ).show();
+        } else {
+            // Model 생성
+            Memo memo = new Memo();
+            memo.setTxt( memoText.getText().toString() );
+            memo.setCreateDate( new Date().getTime() );   // 현재 날짜
+            firebaseDatabase.getReference( "memos/" + firebaseUser.getUid() )
+                    .setValue( memo )
+                    .addOnSuccessListener( new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Snackbar.make( memoText, "메모가 정상적으로 수정되었습니다.", Snackbar.LENGTH_SHORT ).show();
+                        }
+                    } );
+        }
     }
 
     private void updateProfile() {
@@ -205,7 +225,10 @@ public class MainActivity extends AppCompatActivity
                     // Data의 CRUD의 경우 각각 처리
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                        Memo memo = dataSnapshot.getValue( Memo.class );
+                        assert memo != null;
+                        memo.setKey( dataSnapshot.getKey() );
+                        displayMemoList( memo );
                     }
 
                     @Override
@@ -232,6 +255,9 @@ public class MainActivity extends AppCompatActivity
 
     private void displayMemoList(Memo memo) {
         Menu leftMenu = navigationView.getMenu();
-        leftMenu.add( memo.getTitle() );
+        MenuItem item = leftMenu.add( memo.getTitle() );
+        View view = new View(getApplication());
+        view.setTag( memo );
+        item.setActionView( view );
     }
 }

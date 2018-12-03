@@ -1,20 +1,18 @@
 package studyone.ksy.study.model;
 
-import java.util.Date;
-
 public class Memo {
-    private String txt, title;
-    private Date createDate, updateDate;
+    private String txt, title, key;
+    private long createDate, updateDate;    // DB 설정에 따라 추후 long 타입으로 바꿔야 할수도
 
     public String getTxt() {
         return txt;
     }
 
-    public Date getCreateDate() {
+    public long getCreateDate() {
         return createDate;
     }
 
-    public Date getUpdateDate() {
+    public long getUpdateDate() {
         return updateDate;
     }
 
@@ -31,19 +29,27 @@ public class Memo {
         return title;
     }
 
+    public String getKey() {
+        return key;
+    }
+
     public void setTxt(String txt) {
         this.txt = txt;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(long createDate) {
         this.createDate = createDate;
     }
 
-    public void setUpdateDate(Date updateDate) {
+    public void setUpdateDate(long updateDate) {
         this.updateDate = updateDate;
     }
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }
