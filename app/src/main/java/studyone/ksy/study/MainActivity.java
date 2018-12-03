@@ -1,10 +1,10 @@
 package studyone.ksy.study;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -12,9 +12,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    // 인증 객체
+    private FirebaseAuth firebaseAuth;
+    // 유저 객체
+    private FirebaseUser firebaseUser;
+    // 데이터베이스
+    private FirebaseDatabase firebaseDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +35,6 @@ public class MainActivity extends AppCompatActivity
         setContentView( R.layout.activity_main );
         Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
-
         FloatingActionButton fab = (FloatingActionButton) findViewById( R.id.fab );
         fab.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -40,6 +52,23 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById( R.id.nav_view );
         navigationView.setNavigationItemSelectedListener( this );
+
+        // Intance 얻어오기
+        firebaseAuth = FirebaseAuth.getInstance();  // Singleton이기 때문에 Instance 유지됨
+        firebaseUser = firebaseAuth.getCurrentUser();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+
+        // 현재 로그인한 사용자의 이메일을 네비게이션뷰에 출력
+        View view = navigationView.getHeaderView( 0 );
+        TextView emailView = view.findViewById( R.id.userEmail );
+        emailView.setText( firebaseUser.getEmail() );
+
+        // 인증 못받아오면 다시 AuthActivity로 이동
+        if(firebaseUser == null) {
+            startActivity( new Intent( this, AuthActivity.class ) );
+            finish();
+            return;
+        }
     }
 
     @Override

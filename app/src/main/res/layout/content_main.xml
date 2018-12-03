@@ -8,5 +8,13 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:inputType="textMultiLine"
+        android:gravity="top"
+        android:background="@null"
+        android:hint="메모를 입력해 주세요"/>
+
 
 </android.support.constraint.ConstraintLayout>
