@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,12 +9,14 @@
     tools:showIn="@layout/app_bar_main">
 
     <EditText
+        android:id="@+id/contentMemo"
+        android:layout_gravity="top"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:inputType="textMultiLine"
-        android:gravity="top"
+        android:layout_marginTop="8dp"
         android:background="@null"
-        android:hint="메모를 입력해 주세요"/>
+        android:hint="메모를 입력해 주세요"
+        android:inputType="textMultiLine"/>
 
 
-</android.support.constraint.ConstraintLayout>
+</android.support.design.widget.CoordinatorLayout>
