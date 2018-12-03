@@ -1,0 +1,43 @@
+{
+  "project_info": {
+    "project_number": "491110518260",
+    "firebase_url": "https://studyone-689a5.firebaseio.com",
+    "project_id": "studyone-689a5",
+    "storage_bucket": "studyone-689a5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:491110518260:android:8766cea2fb8963fe",
+        "android_client_info": {
+
+         "package_name": "studyone.ksy.study"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "491110518260-jr7kbshrscjg5pkunfda84c3lnqs2gsc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZpj8-SWQ3hHGw0HnS69J4ER28b9Ey5pg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
