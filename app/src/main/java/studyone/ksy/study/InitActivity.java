@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -25,20 +26,22 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-public class AuthActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
+public class InitActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 
     private SignInButton signInButton;
     private GoogleApiClient googleApiClient;
     private GoogleSignInClient googleSignInClient;
     private GoogleSignInOptions googleSignInOptions;
     private FirebaseAuth firebaseAuth;
+    private Button gotoMysqlBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
-        setContentView( R.layout.activity_auth );
+        setContentView( R.layout.activity_init );
 
         signInButton = findViewById( R.id.signInButton );
+        gotoMysqlBtn = findViewById( R.id.gotoMysql );
 
         googleSignInOptions = new GoogleSignInOptions.Builder( GoogleSignInOptions.DEFAULT_SIGN_IN )
                 .requestIdToken( getString(R.string.default_web_client_id ))    // 서버의 클라이언트 id를 requestIdToken에 전달
@@ -54,11 +57,20 @@ public class AuthActivity extends AppCompatActivity implements GoogleApiClient.O
 
         googleSignInClient = GoogleSignIn.getClient( this, googleSignInOptions );
         signInButton.setSize( SignInButton.SIZE_STANDARD ); // 기본 사이즈
+
         signInButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = Auth.GoogleSignInApi.getSignInIntent( googleApiClient );
                 startActivityForResult( intent, 100 );  // 인증 성공 시 code 반환
+            }
+        } );
+
+        gotoMysqlBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity( new Intent(InitActivity.this, MysqlTestActivity.class) );
+                finish();
             }
         } );
 
@@ -99,7 +111,7 @@ public class AuthActivity extends AppCompatActivity implements GoogleApiClient.O
                 String email = firebaseUser.getEmail();
                 Toast.makeText( getApplicationContext(), email+"님 안녕하세요", Toast.LENGTH_SHORT ).show();
 
-                Intent intent = new Intent( getApplicationContext(), MainActivity.class);
+                Intent intent = new Intent( getApplicationContext(), MemoActivity.class);
                 startActivity( intent );
                 finish();
             }

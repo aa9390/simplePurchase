@@ -4,6 +4,10 @@ public class Memo {
     private String txt, title, key;
     private long createDate, updateDate;    // DB 설정에 따라 추후 long 타입으로 바꿔야 할수도
 
+    public Memo() {
+        super();
+    }
+
     public String getTxt() {
         return txt;
     }

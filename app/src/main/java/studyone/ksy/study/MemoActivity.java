@@ -34,7 +34,7 @@ import java.util.Date;
 
 import studyone.ksy.study.model.Memo;
 
-public class MainActivity extends AppCompatActivity
+public class MemoActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Context context;
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
-        setContentView( R.layout.activity_main );
+        setContentView( R.layout.activity_memo );
 
         context = getBaseContext();
 
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity
 
         // 인증 못받아오면 다시 AuthActivity로 이동
         if(firebaseUser == null) {
-            startActivity( new Intent( this, AuthActivity.class ) );
+            startActivity( new Intent( this, InitActivity.class ) );
             finish();
             return;
         }
@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 firebaseAuth.signOut();
-                startActivity( new Intent(MainActivity.this, AuthActivity.class) );
+                startActivity( new Intent(MemoActivity.this, InitActivity.class) );
                 finish();
             }
         } ).show();
@@ -266,9 +266,10 @@ public class MainActivity extends AppCompatActivity
                     // Data의 CRUD의 경우 각각 처리
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                        Memo memo = dataSnapshot.getValue( Memo.class );
-                        memo.setKey( dataSnapshot.getKey() );
-                        displayMemoList( memo );
+//                        Memo memo = dataSnapshot.getValue( Memo.class );
+//                        Log.d("@@@@dataSnapshotValue:", dataSnapshot.getValue( Memo.class ).toString());
+//                        memo.setKey( dataSnapshot.getKey() );
+//                        displayMemoList( memo );
                     }
 
                     @Override
