@@ -1,22 +1,18 @@
 package studyone.ksy.study;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,10 +32,7 @@ import java.util.Date;
 
 import studyone.ksy.study.model.Memo;
 
-public class MemoActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
-
-    private Context context;
+public class MemoFragment extends Fragment {
 
     // 인증 객체
     private FirebaseAuth firebaseAuth;
@@ -56,131 +49,47 @@ public class MemoActivity extends AppCompatActivity
     private NavigationView navigationView;
     private EditText memoText;
     private String selectedMemoKey;
+    private FloatingActionButton saveMemoBtn;
+
+    public MemoFragment() {
+
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        saveMemoBtn = (FloatingActionButton) getView().findViewById( R.id.saveMemoBtn );
+
+        // Intance 얻어오기
+        firebaseAuth = FirebaseAuth.getInstance();  // Singleton이기 때문에 Instance 유지됨
+        firebaseUser = firebaseAuth.getCurrentUser();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+
+        // 저장된 메모 가져오기
+        getMemosFromDatabase();
+
+        // 메모 저장 버튼 클릭 시
+        saveMemoBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 메뉴에서 메모를 선택한 상태이면 -> selectedMemoKey로 불러온 것
+                // 따라서 selectedMemoKey가 null이면 그대로 save, 아니면 update
+                if(selectedMemoKey == null) {
+                    saveMemo();
+                }
+                else {
+                    updateMemo();
+                }
+
+            }
+        } );
         super.onCreate( savedInstanceState );
-        setContentView( R.layout.activity_memo );
-
-//        context = getBaseContext();
-//
-        Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
-        setSupportActionBar( toolbar );
-//        FloatingActionButton saveMemoBtn = (FloatingActionButton) findViewById( R.id.saveMemoBtn );
-//
-        DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
-        drawer.addDrawerListener( toggle );
-        toggle.syncState();
-//
-        navigationView = (NavigationView) findViewById( R.id.nav_view );
-        navigationView.setNavigationItemSelectedListener( this );
-//
-//        memoText = (EditText) findViewById( R.id.contentMemo );
-//
-//        // Intance 얻어오기
-//        firebaseAuth = FirebaseAuth.getInstance();  // Singleton이기 때문에 Instance 유지됨
-//        firebaseUser = firebaseAuth.getCurrentUser();
-//        firebaseDatabase = FirebaseDatabase.getInstance();
-//
-//        // 인증 못받아오면 다시 AuthActivity로 이동
-//        if(firebaseUser == null) {
-//            startActivity( new Intent( this, InitActivity.class ) );
-//            finish();
-//            return;
-//        }
-//
-//        // 프로필 설정
-//        updateProfile();
-//
-//        // 저장된 메모 가져오기
-//        getMemosFromDatabase();
-//
-//        // 메모 저장 버튼 클릭 시
-//        saveMemoBtn.setOnClickListener( new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // 메뉴에서 메모를 선택한 상태이면 -> selectedMemoKey로 불러온 것
-//                // 따라서 selectedMemoKey가 null이면 그대로 save, 아니면 update
-//                if(selectedMemoKey == null) {
-//                    saveMemo();
-//                }
-//                else {
-//                    updateMemo();
-//                }
-//
-//            }
-//        } );
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
-        if (drawer.isDrawerOpen( GravityCompat.START )) {
-            drawer.closeDrawer( GravityCompat.START );
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate( R.menu.main, menu );
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.menuDelete) {
-            deleteMemo();
-        }
-        else if(id == R.id.menuLogout) {
-            logout();
-        }
-
-        return super.onOptionsItemSelected( item );
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        Fragment fragment = null;
-        String title = getString(R.string.app_name);
-
-        if(id == R.id.toMemoRoom) {
-
-            fragment = new MemoFragment();
-            title = "메모하기";
-//            Memo selectedMemo = (Memo) item.getActionView().getTag();
-//            memoText.setText( selectedMemo.getTxt() );
-//            selectedMemoKey = selectedMemo.getKey();    // 수정 or 삭제 시 해당 key로 작업
-//            DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
-//            drawer.closeDrawer( GravityCompat.START );
-        } else if(id == R.id.toChatRoom) {
-
-        }
-
-        if (fragment != null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_fragment_layout, fragment);
-            ft.commit();
-        }
-
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(title);
-        }
-
-        return true;
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate( R.layout.fragment_memo, container, false );
     }
 
     public void initMemo() {
@@ -276,8 +185,7 @@ public class MemoActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 firebaseAuth.signOut();
-                startActivity( new Intent(MemoActivity.this, InitActivity.class) );
-                finish();
+                startActivity( new Intent(getActivity(), InitActivity.class) );
             }
         } ).show();
     }
@@ -329,10 +237,11 @@ public class MemoActivity extends AppCompatActivity
     private void displayMemoList(Memo memo) {
         Menu leftMenu = navigationView.getMenu();
         MenuItem item = leftMenu.add( memo.getTitle() );
-        View view = new View(getApplication());
+        View view = new View(getContext());
         view.setTag( memo );
         item.setActionView( view );
     }
+
 
 
 }

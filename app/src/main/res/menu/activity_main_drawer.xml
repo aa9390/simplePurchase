@@ -3,4 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
+    <group>
+        <item
+            android:id="@+id/toMemoRoom"
+            android:icon="@drawable/ic_menu_gallery"
+            android:iconTint="@color/colorAccent"
+            android:title="메모하기">
+        </item>
+        <item
+            android:id="@+id/toChatRoom"
+            android:icon="@drawable/ic_menu_send"
+            android:iconTint="@color/colorAccent"
+            android:title="채팅하기">
+        </item>
+    </group>
+
 </menu>

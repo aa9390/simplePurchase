@@ -8,15 +8,21 @@
     tools:context=".MemoActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <EditText
-        android:id="@+id/contentMemo"
-        android:layout_gravity="top"
+    <FrameLayout
+        android:id="@+id/content_fragment_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
-        android:background="@null"
-        android:hint="메모를 입력해 주세요"
-        android:inputType="textMultiLine"/>
+        android:layout_height="match_parent">
+    </FrameLayout>
+
+    <!--<EditText-->
+        <!--android:id="@+id/contentMemo"-->
+        <!--android:layout_gravity="top"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:background="@null"-->
+        <!--android:hint="메모를 입력해 주세요"-->
+        <!--android:inputType="textMultiLine"/>-->
 
 
 </android.support.design.widget.CoordinatorLayout>
