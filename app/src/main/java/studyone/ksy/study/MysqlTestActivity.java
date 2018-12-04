@@ -37,7 +37,7 @@ public class MysqlTestActivity extends AppCompatActivity {
 
         listView = findViewById( R.id.recyclerView );
         personList = new ArrayList<>();
-        getDataFromServer("http://192.168.0.218/phpConnection.php");
+        getDataFromServer("http://192.168.219.107/phpConnection.php");
     }
 
     public void getDataFromServer(String url) {

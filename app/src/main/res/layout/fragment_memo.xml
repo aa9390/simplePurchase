@@ -16,6 +16,16 @@
         android:inputType="textMultiLine"
         />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/saveMemoBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        />
 
 
 </FrameLayout>

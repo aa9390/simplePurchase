@@ -57,7 +57,17 @@ public class MemoFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        saveMemoBtn = (FloatingActionButton) getView().findViewById( R.id.saveMemoBtn );
+        super.onCreate( savedInstanceState );
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_memo, container, false);
+
+        saveMemoBtn = rootView.findViewById( R.id.saveMemoBtn );
+        memoText = rootView.findViewById( R.id.contentMemo );
+        navigationView = rootView.findViewById( R.id.nav_view );
 
         // Intance 얻어오기
         firebaseAuth = FirebaseAuth.getInstance();  // Singleton이기 때문에 Instance 유지됨
@@ -82,14 +92,8 @@ public class MemoFragment extends Fragment {
 
             }
         } );
-        super.onCreate( savedInstanceState );
-    }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate( R.layout.fragment_memo, container, false );
+        return rootView;
     }
 
     public void initMemo() {

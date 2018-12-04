@@ -167,7 +167,8 @@ public class MemoActivity extends AppCompatActivity
 //            DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
 //            drawer.closeDrawer( GravityCompat.START );
         } else if(id == R.id.toChatRoom) {
-
+            fragment = new ChatFragment();
+            title = "채팅하기";
         }
 
         if (fragment != null) {
@@ -276,7 +277,7 @@ public class MemoActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 firebaseAuth.signOut();
-                startActivity( new Intent(MemoActivity.this, InitActivity.class) );
+                startActivity( new Intent(getApplicationContext(), InitActivity.class) );
                 finish();
             }
         } ).show();
