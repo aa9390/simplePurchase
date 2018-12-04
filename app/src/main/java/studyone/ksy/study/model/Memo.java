@@ -18,7 +18,7 @@ public class Memo {
 
     // 첫 개행문자가 나올 때까지를 제목으로 정함.
     public String getTitle() {
-        if(!txt.isEmpty()) {
+        if(txt != null) {
             if(txt.indexOf( "\n" ) > -1) {
                 return txt.substring( 0, txt.indexOf( "\n" ) );
             }

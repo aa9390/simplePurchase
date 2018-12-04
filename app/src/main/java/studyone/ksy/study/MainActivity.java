@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Date;
@@ -43,7 +44,12 @@ public class MainActivity extends AppCompatActivity
     // 유저 객체
     private FirebaseUser firebaseUser;
     // 데이터베이스
-    private FirebaseDatabase firebaseDatabase;
+    private static FirebaseDatabase firebaseDatabase;
+    // 로컬 영속성
+    static {
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseDatabase.setPersistenceEnabled( true );
+    }
 
     private NavigationView navigationView;
     private EditText memoText;
@@ -59,22 +65,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
         FloatingActionButton saveMemoBtn = (FloatingActionButton) findViewById( R.id.saveMemoBtn );
-
-        // 메모 저장 버튼 클릭 시
-        saveMemoBtn.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // 메뉴에서 메모를 선택한 상태이면 -> selectedMemoKey로 불러온 것
-                // 따라서 selectedMemoKey가 null이면 그대로 save, 아니면 update
-                if(selectedMemoKey == null) {
-                    saveMemo();
-                }
-                else {
-                    updateMemo();
-                }
-
-            }
-        } );
 
         DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -104,6 +94,22 @@ public class MainActivity extends AppCompatActivity
 
         // 저장된 메모 가져오기
         getMemosFromDatabase();
+
+        // 메모 저장 버튼 클릭 시
+        saveMemoBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 메뉴에서 메모를 선택한 상태이면 -> selectedMemoKey로 불러온 것
+                // 따라서 selectedMemoKey가 null이면 그대로 save, 아니면 update
+                if(selectedMemoKey == null) {
+                    saveMemo();
+                }
+                else {
+                    updateMemo();
+                }
+
+            }
+        } );
     }
 
     @Override
@@ -131,8 +137,11 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.menuDelete) {
+            deleteMemo();
+        }
+        else if(id == R.id.menuLogout) {
+            logout();
         }
 
         return super.onOptionsItemSelected( item );
@@ -150,6 +159,11 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
         drawer.closeDrawer( GravityCompat.START );
         return true;
+    }
+
+    public void initMemo() {
+        selectedMemoKey = null; // update 시 혼선 막기 위함
+        memoText.setText( "" );
     }
 
     public void saveMemo() {
@@ -183,18 +197,15 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void initMemo() {
-        memoText.setText( "" );
-    }
-
     public void updateMemo() {
         if (memoText.getText().toString().isEmpty()) {
             Snackbar.make( memoText, "메모를 입력해 주세요.", Snackbar.LENGTH_SHORT ).show();
+            return;
         } else {
             // Model 생성
             Memo memo = new Memo();
             memo.setTxt( memoText.getText().toString() );
-            memo.setCreateDate( new Date().getTime() );   // 현재 날짜
+            memo.setCreateDate( new Date().getTime());   // 현재 날짜
             firebaseDatabase.getReference( "memos/" + firebaseUser.getUid() )
                     .setValue( memo )
                     .addOnSuccessListener( new OnSuccessListener<Void>() {
@@ -219,6 +230,36 @@ public class MainActivity extends AppCompatActivity
         imageView.setImageURI( firebaseUser.getPhotoUrl() );
     }
 
+    private void deleteMemo() {
+        if(selectedMemoKey == null) {
+            return;
+        }
+        Snackbar.make( memoText, "메모를 삭제하시겠습니까?", Snackbar.LENGTH_SHORT ).setAction( "삭제", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                firebaseDatabase.getReference( "memos/" + firebaseUser.getUid() )
+                        .removeValue( new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                Snackbar.make( memoText, "삭제가 완료되었습니다.", Snackbar.LENGTH_SHORT ).show();
+                            }
+                        } );
+            }
+        } ).show();
+
+    }
+
+    private void logout() {
+        Snackbar.make( memoText, "로그아웃 하시겠습니까?", Snackbar.LENGTH_SHORT ).setAction( "로그아웃", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                firebaseAuth.signOut();
+                startActivity( new Intent(MainActivity.this, AuthActivity.class) );
+                finish();
+            }
+        } ).show();
+    }
+
     private void getMemosFromDatabase() {
         firebaseDatabase.getReference( "memos/" + firebaseUser.getUid() )
                 .addChildEventListener( new ChildEventListener() {
@@ -226,14 +267,23 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                         Memo memo = dataSnapshot.getValue( Memo.class );
-                        assert memo != null;
                         memo.setKey( dataSnapshot.getKey() );
                         displayMemoList( memo );
                     }
 
                     @Override
                     public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        Memo memo = dataSnapshot.getValue( Memo.class );
+                        memo.setKey( dataSnapshot.getKey() );
 
+                        // 메모가 수정되었을 때 메뉴에서 제목 갱신
+                        for(int i=0; i<navigationView.getMenu().size(); i++) {
+                            MenuItem menuItem = navigationView.getMenu().getItem( i );
+                            if(memo.getKey().equals( ((Memo)menuItem.getActionView().getTag() ).getKey())) {
+                                menuItem.getActionView().setTag( memo );
+                                menuItem.setTitle( memo.getTitle() );
+                            }
+                        }
                     }
 
                     @Override
@@ -260,4 +310,6 @@ public class MainActivity extends AppCompatActivity
         view.setTag( memo );
         item.setActionView( view );
     }
+
+
 }
