@@ -1,9 +1,10 @@
 package studyone.ksy.study.model;
 
 public class User {
-    private String userGrade, userType;
-    private double userSavingRateOfGrade, userSavingRateOfType;
-    private int userSavingCost;
+    public String userGrade, userType;
+    public double userSavingRateOfGrade, userSavingRateOfType;
+    public int userSavingCost;
+    public String key;
 
     public User() {
     }
@@ -82,5 +83,13 @@ public class User {
 
     public void setUserSavingCost(int userSavingCost) {
         this.userSavingCost = userSavingCost;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -15,14 +16,14 @@ import studyone.ksy.study.model.Thing;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
 
-    private ArrayList<Thing> thingList;
+    private ArrayList<Thing> thingsList;
 
     public MyAdapter() {
         super();
     }
 
     public MyAdapter(ArrayList<Thing> thingList) {
-        this.thingList = thingList;
+        this.thingsList = thingList;
     }
 
     @Override
@@ -46,25 +47,33 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(@NonNull MyAdapter.ViewHolder viewHolder, int i) {
         ViewHolder vh = viewHolder;
-        Thing t = thingList.get( i );
+        Thing t = thingsList.get( i );
 
         vh.thingName.setText( t.getName() );
         vh.thingCost.setText( t.getCost() + "" );
+        if(vh.checkBox.isChecked()) {
+            t.setChecked( true );
+        }
+        else {
+            t.setChecked( false );
+        }
     }
 
     @Override
     public int getItemCount() {
-        return thingList.size();
+        return thingsList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         TextView thingName, thingCost;
+        CheckBox checkBox;
 
         public ViewHolder(@NonNull View itemView) {
             super( itemView );
 
             thingName = itemView.findViewById( R.id.thingName );
             thingCost = itemView.findViewById( R.id.thingCost );
+            checkBox = itemView.findViewById( R.id.checkbox );
         }
     }
 }

@@ -26,17 +26,12 @@ public class UserInfoChange extends AppCompatActivity {
     private FirebaseUser firebaseUser;
     // 데이터베이스
     private static FirebaseDatabase firebaseDatabase;
-    // 로컬 영속성
-    static {
-        firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseDatabase.setPersistenceEnabled( true );
-    }
 
     private RadioGroup radioUserType;
     private RadioButton radioGeneral;
     private RadioButton radioStaff;
     private RadioButton radioVeterans;
-    private Button userTypeSaveBtn;
+    private Button userInfoSaveBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,28 +47,25 @@ public class UserInfoChange extends AppCompatActivity {
         radioGeneral = findViewById( R.id.radioGeneral );
         radioStaff = findViewById( R.id.radioStaff );
         radioVeterans = findViewById( R.id.radioVeterans );
+        userInfoSaveBtn = findViewById( R.id.userInfosaveBtn );
 
-        userTypeSaveBtn.setOnClickListener( new View.OnClickListener() {
+        userInfoSaveBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                User user = new User(  );
                 int id = radioUserType.getCheckedRadioButtonId();
-
                 RadioButton rb = findViewById( id );
 
-                user.setUserGrade( "sliver" );
-                user.setUserType( rb.getText().toString() );
-                user.setUserSavingRateOfGrade( user.getUserGrade() );
+                User user = new User( "sliver", rb.getText() + "", 0.0, 0.0, 0  );
                 user.setUserSavingRateOfType( user.getUserType() );
-                user.setUserSavingCost( 0 );
+                user.setUserSavingRateOfGrade( user.getUserGrade() );
 
                 // setValue의 인자로 DB에 들어갈 데이터 형식의 Object가 들어감
-                firebaseDatabase.getReference( "users/" + firebaseUser.getUid() ).push().setValue( user )
+                firebaseDatabase.getReference( "users/" + firebaseUser.getUid()).push().setValue( user )
                 .addOnSuccessListener( new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         // 정보 저장 성공 시
-                        Snackbar.make( getCurrentFocus(), "정보가 저장되었습니다.", Snackbar.LENGTH_SHORT ).show();
+                        Snackbar.make( radioUserType, "정보가 저장되었습니다.", Snackbar.LENGTH_SHORT ).show();
                         startActivity( new Intent( getApplicationContext(), MainActivity.class ) );
                         finish();
                     }
@@ -82,7 +74,7 @@ public class UserInfoChange extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // 정보 저장 실패 시
-                        Snackbar.make( getCurrentFocus(), "네트워크 설정을 확인해 주세요.", Snackbar.LENGTH_SHORT ).show();
+                        Snackbar.make( radioUserType, "네트워크 설정을 확인해 주세요.", Snackbar.LENGTH_SHORT ).show();
                     }
                 } );
             }

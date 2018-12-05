@@ -6,7 +6,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+
+import studyone.ksy.study.model.Thing;
+
 public class CancelFragment extends Fragment {
+
+    // 인증 객체
+    private FirebaseAuth firebaseAuth;
+    // 유저 객체
+    private FirebaseUser firebaseUser;
+    // 데이터베이스
+    private static FirebaseDatabase firebaseDatabase;
+
+    // 상품들
+    public ArrayList<Thing> thingsList;
+
     public CancelFragment() {
         // Required empty public constructor
     }

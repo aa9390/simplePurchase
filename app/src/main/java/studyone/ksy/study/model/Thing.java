@@ -5,6 +5,9 @@ public class Thing {
     private int cost;
     private boolean isChecked;
 
+    public Thing() {
+    }
+
     public Thing(String name, int cost) {
         this.name = name;
         this.cost = cost;
@@ -33,4 +36,7 @@ public class Thing {
     public void setChecked(boolean checked) {
         isChecked = checked;
     }
+
+
+
 }
