@@ -35,7 +35,11 @@ dependencies {
     // firebase Database
     implementation 'com.google.firebase:firebase-database:16.0.5'
     // Glide
-    compile 'com.github.bumptech.glide:glide:3.6.0'
+    implementation 'com.github.bumptech.glide:glide:3.6.0'
+    // retrofit2
+    implementation 'com.squareup.retrofit2:retrofit:2.0.2'
+    // GSON
+    implementation 'com.squareup.retrofit2:converter-gson:2.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

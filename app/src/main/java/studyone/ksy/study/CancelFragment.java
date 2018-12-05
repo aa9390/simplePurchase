@@ -6,8 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class ChatFragment extends Fragment {
-    public ChatFragment() {
+public class CancelFragment extends Fragment {
+    public CancelFragment() {
         // Required empty public constructor
     }
 

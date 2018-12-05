@@ -111,7 +111,7 @@ public class InitActivity extends AppCompatActivity implements GoogleApiClient.O
                 String email = firebaseUser.getEmail();
                 Toast.makeText( getApplicationContext(), email+"님 안녕하세요", Toast.LENGTH_SHORT ).show();
 
-                Intent intent = new Intent( getApplicationContext(), MemoActivity.class);
+                Intent intent = new Intent( getApplicationContext(), UserInfoChange.class);
                 startActivity( intent );
                 finish();
             }

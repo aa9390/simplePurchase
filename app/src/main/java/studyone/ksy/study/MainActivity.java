@@ -35,8 +35,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.Date;
 
 import studyone.ksy.study.model.Memo;
+import studyone.ksy.study.model.User;
 
-public class MemoActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Context context;
@@ -60,59 +61,85 @@ public class MemoActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
-        setContentView( R.layout.activity_memo );
+        setContentView( R.layout.activity_main );
 
-//        context = getBaseContext();
-//
         Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
-//        FloatingActionButton saveMemoBtn = (FloatingActionButton) findViewById( R.id.saveMemoBtn );
-//
+
         DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
         drawer.addDrawerListener( toggle );
         toggle.syncState();
-//
+
         navigationView = (NavigationView) findViewById( R.id.nav_view );
         navigationView.setNavigationItemSelectedListener( this );
-//
-//        memoText = (EditText) findViewById( R.id.contentMemo );
-//
-//        // Intance 얻어오기
-//        firebaseAuth = FirebaseAuth.getInstance();  // Singleton이기 때문에 Instance 유지됨
-//        firebaseUser = firebaseAuth.getCurrentUser();
-//        firebaseDatabase = FirebaseDatabase.getInstance();
-//
+
+        // Intance 얻어오기
+        firebaseAuth = FirebaseAuth.getInstance();  // Singleton이기 때문에 Instance 유지됨
+        firebaseUser = firebaseAuth.getCurrentUser();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+
 //        // 인증 못받아오면 다시 AuthActivity로 이동
-//        if(firebaseUser == null) {
-//            startActivity( new Intent( this, InitActivity.class ) );
-//            finish();
-//            return;
-//        }
-//
-//        // 프로필 설정
-//        updateProfile();
-//
-//        // 저장된 메모 가져오기
-//        getMemosFromDatabase();
-//
-//        // 메모 저장 버튼 클릭 시
-//        saveMemoBtn.setOnClickListener( new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // 메뉴에서 메모를 선택한 상태이면 -> selectedMemoKey로 불러온 것
-//                // 따라서 selectedMemoKey가 null이면 그대로 save, 아니면 update
-//                if(selectedMemoKey == null) {
-//                    saveMemo();
-//                }
-//                else {
-//                    updateMemo();
-//                }
-//
-//            }
-//        } );
+        if(firebaseUser == null) {
+            startActivity( new Intent( this, InitActivity.class ) );
+            finish();
+            return;
+        }
+
+        // 프로필 설정
+        updateProfile();
     }
+
+    private void updateProfile() {
+        // 현재 로그인한 사용자의 프로필을 네비게이션뷰에 출력
+        View view = navigationView.getHeaderView( 0 );
+        TextView emailView = view.findViewById( R.id.userEmail );
+        TextView nameView = view.findViewById( R.id.userName );
+        ImageView imageView = view.findViewById( R.id.userImage );
+
+        emailView.setText( firebaseUser.getEmail() );
+        nameView.setText( firebaseUser.getDisplayName() );
+        Glide.with( this ).load( firebaseUser.getPhotoUrl() ).into( imageView );
+
+        TextView userGradeView = view.findViewById( R.id.userGrade );
+        TextView userTypeView = view.findViewById( R.id.userType );
+        TextView userSavingCostView = view.findViewById( R.id.userSavingMoney );
+
+        User user = new User();
+
+        //////////// dummy data
+        user.setUserGrade( "sliver" );
+        user.setUserType( "general" );
+        user.setUserSavingRateOfGrade( user.getUserGrade() );
+        user.setUserSavingRateOfType( user.getUserType() );
+        user.setUserSavingCost( 0 );
+        ///////////
+
+        userGradeView.setText( user.getUserGrade() );
+        userTypeView.setText( user.getUserType() );
+        userSavingCostView.setText( user.getUserSavingCost() + "" );
+
+        // setValue의 인자로 DB에 들어갈 데이터 형식의 Object가 들어감
+//        firebaseDatabase.getReference( "users/" + firebaseUser.getUid() ).push().setValue( user )
+//                .addOnSuccessListener( new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void aVoid) {
+//                        // 메모 저장 성공 시
+//                        Snackbar.make( getCurrentFocus(), "메모가 저장되었습니다.", Snackbar.LENGTH_SHORT ).show();
+//                        // 새로운 메모를 받기 위해 입력한 메모 초기화
+//                        initMemo();
+//                    }
+//                } )
+//                .addOnFailureListener( new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        // 메모 저장 실패 시
+//                        Snackbar.make( getCurrentFocus(), "네트워크 설정을 확인해 주세요.", Snackbar.LENGTH_SHORT ).show();
+//                    }
+//                } );
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -133,16 +160,10 @@ public class MemoActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.menuDelete) {
-            deleteMemo();
-        }
-        else if(id == R.id.menuLogout) {
+        if(id == R.id.menuLogout) {
             logout();
         }
 
@@ -157,18 +178,15 @@ public class MemoActivity extends AppCompatActivity
         Fragment fragment = null;
         String title = getString(R.string.app_name);
 
-        if(id == R.id.toMemoRoom) {
+        if (id == R.id.toSetting) {
+            /// 내 정보 변경 팝업 등장
 
-            fragment = new MemoFragment();
-            title = "메모하기";
-//            Memo selectedMemo = (Memo) item.getActionView().getTag();
-//            memoText.setText( selectedMemo.getTxt() );
-//            selectedMemoKey = selectedMemo.getKey();    // 수정 or 삭제 시 해당 key로 작업
-//            DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
-//            drawer.closeDrawer( GravityCompat.START );
+        } else if(id == R.id.toMemoRoom) {
+            fragment = new BuyThingsFragment();
+            title = "상품구매";
         } else if(id == R.id.toChatRoom) {
-            fragment = new ChatFragment();
-            title = "채팅하기";
+            fragment = new CancelFragment();
+            title = "구매취소";
         }
 
         if (fragment != null) {
@@ -183,6 +201,16 @@ public class MemoActivity extends AppCompatActivity
 
         return true;
     }
+
+
+
+
+
+
+
+
+
+
 
     public void initMemo() {
         selectedMemoKey = null; // update 시 혼선 막기 위함
@@ -240,18 +268,7 @@ public class MemoActivity extends AppCompatActivity
         }
     }
 
-    private void updateProfile() {
-        // 현재 로그인한 사용자의 프로필을 네비게이션뷰에 출력
-        View view = navigationView.getHeaderView( 0 );
-        TextView emailView = view.findViewById( R.id.userEmail );
-        emailView.setText( firebaseUser.getEmail() );
 
-        TextView nameView = view.findViewById( R.id.userName );
-        nameView.setText( firebaseUser.getDisplayName() );
-
-        ImageView imageView = view.findViewById( R.id.userImage );
-        Glide.with( this ).load( firebaseUser.getPhotoUrl() ).into( imageView );
-    }
 
     private void deleteMemo() {
         if(selectedMemoKey == null) {
@@ -334,6 +351,5 @@ public class MemoActivity extends AppCompatActivity
         view.setTag( memo );
         item.setActionView( view );
     }
-
 
 }

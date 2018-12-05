@@ -3,18 +3,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
+    <item
+        android:id="@+id/toSetting"
+        android:title="내정보변경">
+    </item>
+
     <group>
+
         <item
             android:id="@+id/toMemoRoom"
             android:icon="@drawable/ic_menu_gallery"
             android:iconTint="@color/colorAccent"
-            android:title="메모하기">
+            android:title="상품구매">
         </item>
         <item
             android:id="@+id/toChatRoom"
             android:icon="@drawable/ic_menu_send"
             android:iconTint="@color/colorAccent"
-            android:title="채팅하기">
+            android:title="구매취소">
         </item>
     </group>
 

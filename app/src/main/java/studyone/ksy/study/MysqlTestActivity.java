@@ -3,6 +3,7 @@ package studyone.ksy.study;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -22,12 +23,12 @@ public class MysqlTestActivity extends AppCompatActivity {
 
     String myJSON;
 
-    private static final String TAG_ID = "id";
-    private static final String TAG_NAME = "name";
+    private static final String TAG_THING_NAME = "name";
+    private static final String TAG_THING_COST = "cost";
     private static final String TAG_RESULTS = "result";
 
     JSONArray peoples = null;
-    ArrayList<HashMap<String, String>> personList;
+    ArrayList<HashMap<String, String>> thingsList;
     ListView listView;
 
     @Override
@@ -35,9 +36,10 @@ public class MysqlTestActivity extends AppCompatActivity {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_mysql_test );
 
-        listView = findViewById( R.id.recyclerView );
-        personList = new ArrayList<>();
-        getDataFromServer("http://192.168.219.107/phpConnection.php");
+        listView = findViewById( R.id.listView );
+        thingsList = new ArrayList<>();
+        getDataFromServer("http://10.131.160.65/phpConnection.php");
+
     }
 
     public void getDataFromServer(String url) {
@@ -86,23 +88,23 @@ public class MysqlTestActivity extends AppCompatActivity {
 
             for (int i = 0; i < peoples.length(); i++) {
                 JSONObject c = peoples.getJSONObject(i);
-                String id = c.getString(TAG_ID);
-                String name = c.getString(TAG_NAME);
+                String name = c.getString(TAG_THING_NAME);
+                String cost = c.getString(TAG_THING_COST);
 
-                HashMap<String, String> persons = new HashMap<>();
+                HashMap<String, String> thing = new HashMap<>();
 
-                persons.put(TAG_ID, id);
-                persons.put(TAG_NAME, name);
+                thing.put(TAG_THING_NAME, name);
+                thing.put(TAG_THING_COST, cost);
 
-                personList.add(persons);
+                thingsList.add(thing);
 
-//                Toast.makeText( getApplicationContext(), id, Toast.LENGTH_SHORT ).show();
+                Log.d("@@@@@@@@@@@DB Size:",thingsList.size() + "" );
             }
 
             ListAdapter adapter = new SimpleAdapter(
-                    MysqlTestActivity.this, personList, R.layout.item_list,
-                    new String[]{TAG_ID, TAG_NAME},
-                    new int[]{R.id.idText, R.id.nameText}
+                    this, thingsList, R.layout.item_list,
+                    new String[]{TAG_THING_NAME, TAG_THING_COST},
+                    new int[]{R.id.thingName, R.id.thingCost}
             );
 
             listView.setAdapter( adapter );
